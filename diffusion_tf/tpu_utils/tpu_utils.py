@@ -115,6 +115,11 @@ def run_training(
     datetime.now().strftime('%Y-%m-%d') if date_str is None else date_str,
     exp_name
   )
+#########################################
+  if not tf.io.gfile.exists(model_dir):
+    print(f"Creating directory: {model_dir}")
+    tf.io.gfile.makedirs(model_dir)
+#########################################
   print('model dir:', model_dir)
   if tf.io.gfile.exists(model_dir):
     print('model dir already exists: {}'.format(model_dir))
