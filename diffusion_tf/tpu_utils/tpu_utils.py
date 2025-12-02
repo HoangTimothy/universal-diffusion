@@ -19,7 +19,8 @@ from .. import utils
 # ========== TPU utilities ==========
 
 def num_tpu_replicas():
-  return tpu_function.get_tpu_context().number_of_shards
+  # return tpu_function.get_tpu_context().number_of_shards
+  return 1 # GPU colab is single
 
 
 def get_tpu_replica_id():
@@ -183,11 +184,12 @@ def run_training(
   print("warm_start_from:", warm_start_from)
   estimator = tf.estimator.tpu.TPUEstimator(
     model_fn=model_fn,
-    use_tpu=True,
+    use_tpu=False, # colab GPU does not support TPU, before is True
     train_batch_size=total_bs,
     eval_batch_size=total_bs,
     config=tf.estimator.tpu.RunConfig(
-      cluster=tf.distribute.cluster_resolver.TPUClusterResolver(tpu=tpu, zone=zone, project=project),
+      # cluster=tf.distribute.cluster_resolver.TPUClusterResolver(tpu=tpu, zone=zone, project=project),
+      cluster=None, # colab GPU does not support TPU
       model_dir=model_dir,
       session_config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=True),
       tpu_config=tf.estimator.tpu.TPUConfig(

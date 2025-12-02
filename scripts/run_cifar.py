@@ -137,9 +137,12 @@ def train(
     dropout=0.1, randflip=1,
     tfds_data_dir='tensorflow_datasets', log_dir='logs', keep_checkpoint_max=2
 ):
-  region = utils.get_gcp_region()
-  tfds_data_dir = 'gs://{}-{}/{}'.format(bucket_name_prefix, region, tfds_data_dir)
-  log_dir = 'gs://{}-{}/{}'.format(bucket_name_prefix, region, log_dir)
+  # region = utils.get_gcp_region()
+  region = 'local' # colab 
+  tfds_data_dir = '{}-{}/{}'.format(bucket_name_prefix, region, tfds_data_dir)
+  log_dir = '{}-{}/{}'.format(bucket_name_prefix, region, log_dir)
+  # tfds_data_dir = 'gs://{}-{}/{}'.format(bucket_name_prefix, region, tfds_data_dir)
+  # log_dir = 'gs://{}-{}/{}'.format(bucket_name_prefix, region, log_dir)
   kwargs = dict(locals())
   ds = datasets.get_dataset(dataset, tfds_data_dir=tfds_data_dir)
   tpu_utils.run_training(

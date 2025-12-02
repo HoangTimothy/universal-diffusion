@@ -7,9 +7,41 @@ from .. import nn
 def nonlinearity(x):
   return tf.nn.swish(x)
 
+# --- Fix to appropriate FILE unet.py ---
 
-def normalize(x, *, temb, name):
-  return tf_contrib.layers.group_norm(x, scope=name)
+def group_norm_fix(x, scope=None):
+    with tf.variable_scope(scope or 'group_norm'):
+        G = 32
+        x = tf.cast(x, tf.float32)
+        
+        if hasattr(x.get_shape(), 'as_list'):
+            shape = x.get_shape().as_list()
+        else:
+            shape = x.shape.as_list()
+            
+        C = shape[-1]
+        
+        if hasattr(C, 'value'): 
+            C = C.value
+            
+        s = tf.shape(x)
+        N, H, W = s[0], s[1], s[2]
+        
+        x = tf.reshape(x, [N, H, W, G, C // G])
+        mean, var = tf.nn.moments(x, [1, 2, 4], keep_dims=True)
+        x = (x - mean) * tf.rsqrt(var + 1e-5)
+        
+        x = tf.reshape(x, [N, H, W, C])
+        
+        gamma = tf.get_variable('gamma', [C], initializer=tf.ones_initializer())
+        beta = tf.get_variable('beta', [C], initializer=tf.zeros_initializer())
+        
+        return x * gamma + beta
+
+def normalize(x, temb, name):
+  return group_norm_fix(x, scope=name)
+# def normalize(x, *, temb, name):
+#   return tf_contrib.layers.group_norm(x, scope=name)
 
 
 def upsample(x, *, name, with_conv):
