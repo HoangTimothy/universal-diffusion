@@ -168,7 +168,8 @@ def run_training(
       lr=warmed_up_lr,
       optimizer=optimizer,
       grad_clip=grad_clip / float(num_tpu_replicas()),
-      tpu=True
+      # tpu=True
+      tpu=False # colab not support
     )
 
     # ema

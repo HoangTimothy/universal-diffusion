@@ -163,7 +163,8 @@ def make_optimizer(
   else:
     raise NotImplementedError(optimizer)
 
-  if tpu:
+  # if tpu:
+  if False:  # colab GPU does not support TPU
     optimizer = tf.tpu.CrossShardOptimizer(optimizer)
 
   # compute gradient
